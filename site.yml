@@ -1,11 +1,11 @@
 ---
 - hosts: all
   roles:
-    - libs
+    - common
 
 - hosts: all
   roles:
-    - common
+    - libs
 
 - hosts: server
   roles:
@@ -14,3 +14,5 @@
 - hosts: agents
   roles:
     - agent
+
+

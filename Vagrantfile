@@ -53,7 +53,7 @@ Vagrant.configure("2") do |config|
   #
   config.vm.provider "virtualbox" do |v|
       v.memory = 2048
-      v.cpus = 1
+      v.cpus = 2
   end
   #
   # View the documentation for the provider you are using for more
@@ -68,8 +68,8 @@ Vagrant.configure("2") do |config|
         "agents" => ["default"]
     }
     ansible.extra_vars = {
-        GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com',
-        GOCD_AGENT_INSTANCES: 1
+        GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com'
+        #GOCD_AGENT_INSTANCES: 2
     }
     ansible.become = true
     ansible.verbose = "v"
