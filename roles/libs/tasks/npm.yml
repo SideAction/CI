@@ -11,9 +11,17 @@
   apt: pkg={{item}} state=installed update_cache=true
   become: true
   with_items:
+  - git
   - nodejs
   - yarn
+  - python-dev
+  - libssl-dev
+  - ruby-dev
   - ruby-sass
+
+- name: Update NPM packages
+  command: /usr/bin/npm update
+  become: true
 
 #Has to be command or the ansible task somehow ignores this..
 - name: Ensure we have the most recent npm

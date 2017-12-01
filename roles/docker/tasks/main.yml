@@ -1,0 +1,50 @@
+---
+- name: Get the docker gpg key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  become: true
+
+- name: Remove older docker packages
+  apt: pkg={{item}} state=removed 
+  become: true
+  with_items:
+    - docker
+    - docker-engine
+    - docker.io
+
+- name: Install required packages for apt over https
+  become: true
+  apt: pkg={{item}} state=installed
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: Setup the repository for this arch
+  become: true
+  shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+- name: Update apt and install the docker package
+  apt: pkg={{item}} state=installed update_cache=true
+  with_items:
+    - docker-ce
+    - docker-compose
+
+- user: 
+    name: ubuntu
+    comment: "Seriously docker, wtf"
+    group: docker
+    append: yes
+
+- user:
+    name: go
+    comment: "Go build system"
+    group: docker
+    append: yes
+    
+- name: Validate docker is up and running an that we can run docker commands
+  shell: docker run hello-world
+  become: true
+  become_user: go
+
+
