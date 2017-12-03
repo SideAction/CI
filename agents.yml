@@ -1,0 +1,13 @@
+---
+- hosts: agent*
+  roles:
+    - common
+
+- hosts: agent*
+  roles:
+    - agent
+
+- hosts: agent*
+  roles:
+    - docker
+

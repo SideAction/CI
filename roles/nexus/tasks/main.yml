@@ -1,0 +1,16 @@
+
+---
+# Add base packages
+
+- name: Update apt
+  apt: update_cache=yes cache_valid_time=3600
+  become: true
+  tags: update
+
+- import_tasks: base.yml
+  become: true
+  tags: base
+
+- import_tasks: nexus.yml
+  become: true
+  tags: nexus

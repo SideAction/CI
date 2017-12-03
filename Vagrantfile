@@ -1,80 +1,105 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+network = "192.168.77"
+server_ip = "#{network}.66"
+nexus_ip = "#{network}.67"
+box = "bento/ubuntu-16.04"
+N = 2
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
+=begin
+  config.vm.define "nexus" do |nexus|
+    nexus.vm.box = box
+    nexus.ssh.forward_agent = true
+    nexus.vm.boot_timeout = 120
 
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "bento/ubuntu-16.04"
-  config.ssh.forward_agent = true
-  config.vm.boot_timeout = 120
+    nexus.vm.hostname = "nexus"
+    nexus.vm.network "private_network", ip: "#{nexus_ip}"
+    nexus.vm.network "forwarded_port", guest: 8155, host: 8155, host_ip: "127.0.0.1"
 
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+    nexus.vm.synced_folder "./", "/vagrant"
+    nexus.vm.provider "virtualbox" do |v|
+        v.memory = 1024
+        v.cpus = 1
+    end
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # NOTE: This will enable public access to the opened port
-  # config.vm.network "forwarded_port", guest: 8000, host: 8000
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine and only allow access
-  # via 127.0.0.1 to disable public access
-  config.vm.network "forwarded_port", guest: 8154, host: 8154, host_ip: "127.0.0.1"
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  config.vm.synced_folder "./", "/vagrant"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  config.vm.provider "virtualbox" do |v|
-      v.memory = 2048
-      v.cpus = 2
+    nexus.vm.provision "ansible" do |ansible|
+      ansible.extra_vars = {}
+      ansible.become = true
+      ansible.limit = "all"
+      ansible.verbose = "v"
+      ansible.extra_vars = {remote_user: "vagrant"}
+      ansible.playbook = "nexus.yml"
+    end
   end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
+=end
 
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  config.vm.provision "ansible" do |ansible|
-    ansible.groups = {
-        "server" => ["default"],
-        "agents" => ["default"]
-    }
-    ansible.extra_vars = {
-        GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com'
-        #GOCD_AGENT_INSTANCES: 2
-    }
-    ansible.become = true
-    ansible.verbose = "v"
-    ansible.extra_vars = {remote_user: "vagrant"}
-    ansible.playbook = "site.yml"
+  config.vm.define "gocdserver" do |server|
+    server.vm.box = "bento/ubuntu-16.04"
+    server.ssh.forward_agent = true
+    server.vm.boot_timeout = 120
+
+    server.vm.hostname = "gocd.server"
+    server.vm.network "private_network", ip: "#{server_ip}"
+    server.vm.network "forwarded_port", guest: 8154, host: 8154, host_ip: "127.0.0.1"
+
+    server.vm.synced_folder "./", "/vagrant"
+    server.vm.provider "virtualbox" do |v|
+        v.memory = 1024
+        v.cpus = 1
+    end
+
+    server.vm.provision "ansible" do |ansible|
+      ansible.groups = {
+          "server" => ["default"],
+          "agents" => ["default"]
+      }
+      ansible.extra_vars = {
+          GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com'
+      }
+      ansible.limit = "all"
+      ansible.verbose = "v"
+      ansible.extra_vars = {remote_user: "vagrant"}
+      ansible.playbook = "server.yml"
+    end
+  end
+
+  (1..N).each do |agent_id|
+    config.vm.define "agent#{agent_id}" do |agent|
+      agent.vm.hostname = "agent#{agent_id}"
+      agent.vm.box = "bento/ubuntu-16.04"
+      agent.ssh.forward_agent = true
+      agent.vm.boot_timeout = 120
+
+      agent.vm.hostname = "gocd.agent#{agent_id}"
+      agent.vm.network "private_network", ip: "#{network}.#{20+agent_id}"
+
+      agent.vm.provider "virtualbox" do |v|
+        v.memory = 1024
+        v.cpus = 1
+      end
+
+      # Only execute once the Ansible provisioner,
+      # when all the agents are up and ready.
+      if agent_id == N
+        agent.vm.provision :ansible do |ansible|
+          # Disable default limit to connect to all the agents
+          ansible.limit = "all"
+          ansible.playbook = "agents.yml"
+          ansible.extra_vars = {"remote_user": "vagrant"}
+
+          ansible.groups = {
+              "server" => ["default"],
+              "agents" => ["default"]
+          }
+          ansible.extra_vars = {
+              GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com',
+              GOCD_SERVER_HOST: server_ip
+          }
+        end
+      end
+    end
   end
 
 end
+

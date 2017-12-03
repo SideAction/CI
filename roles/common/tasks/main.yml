@@ -119,6 +119,13 @@
   yum: pkg=git state=installed
   when: ansible_pkg_mgr=='yum' and GOCD_SCM_GIT
 
+- name: Update and upgrade apt packages
+  become: true
+  when: ansible_pkg_mgr=='apt' and GOCD_SCM_GIT
+  apt:
+    upgrade: yes
+    update_cache: yes
+
 - name: apt install git
   become: yes
   apt: pkg=git state=present

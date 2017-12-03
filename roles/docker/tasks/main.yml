@@ -25,18 +25,23 @@
   shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 - name: Update apt and install the docker package
+  become: true
   apt: pkg={{item}} state=installed update_cache=true
   with_items:
     - docker-ce
     - docker-compose
 
-- user: 
+- name: Setup the ubuntu user as able to run docker
+  become: true
+  user: 
     name: ubuntu
     comment: "Seriously docker, wtf"
     group: docker
     append: yes
 
-- user:
+- name: Make it so the go user can actually run docker commands
+  become: true
+  user:
     name: go
     comment: "Go build system"
     group: docker
