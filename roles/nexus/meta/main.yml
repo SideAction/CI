@@ -1,19 +1,23 @@
----
 galaxy_info:
-  author: aalda
-  description: 
-  company: CodingBunch
-  license: MIT
-  min_ansible_version: 1.7
+  author: Savoir-faire Linux
+  description: Nexus Repository Manager 3.x for RedHat/CentOS
+  company: Savoir-faire Linux
+
+  license: license (GPLv3)
+
+  min_ansible_version: 2.1
+
+  github_branch: master
+
   platforms:
-    - name: Ubuntu
+    - name: EL
       versions:
-        - precise
-        - quantal
-        - raring
-        - saucy
-        - trusty
-  categories:
-    - development
-  dependencies: []
-  
+      - 7
+
+  galaxy_tags:
+    - nexus
+    - java
+    - maven
+    - web
+
+dependencies: []

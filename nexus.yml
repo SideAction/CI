@@ -1,5 +1,13 @@
 ---
 - hosts: nexus
   roles:
+    - common
+
+- hosts: nexus
+  roles:
+    - docker
+
+- hosts: nexus
+  roles:
     - nexus
 

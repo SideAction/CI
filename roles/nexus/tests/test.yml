@@ -1,7 +1,0 @@
----
-- hosts: nexus
-  gather_facts: yes
-  roles:
-    - ansible-nexus-oss
-  tasks:
-    - wait_for: port=8155 delay=10

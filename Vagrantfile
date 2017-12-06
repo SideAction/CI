@@ -7,7 +7,7 @@ box = "bento/ubuntu-16.04"
 N = 2
 
 Vagrant.configure("2") do |config|
-=begin
+
   config.vm.define "nexus" do |nexus|
     nexus.vm.box = box
     nexus.ssh.forward_agent = true
@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
 
     nexus.vm.hostname = "nexus"
     nexus.vm.network "private_network", ip: "#{nexus_ip}"
-    nexus.vm.network "forwarded_port", guest: 8155, host: 8155, host_ip: "127.0.0.1"
+    nexus.vm.network "forwarded_port", guest: 8081, host: 8155, host_ip: "127.0.0.1"
 
     nexus.vm.synced_folder "./", "/vagrant"
     nexus.vm.provider "virtualbox" do |v|
@@ -32,8 +32,8 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "nexus.yml"
     end
   end
-=end
 
+=begin
   config.vm.define "gocdserver" do |server|
     server.vm.box = "bento/ubuntu-16.04"
     server.ssh.forward_agent = true
@@ -100,6 +100,7 @@ Vagrant.configure("2") do |config|
       end
     end
   end
+=end
 
 end
 

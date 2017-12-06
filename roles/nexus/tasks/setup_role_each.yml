@@ -1,0 +1,5 @@
+---
+- import_tasks: call_script.yml
+  vars:
+    script_name: setup_role
+    args: "{{ item }}"
