@@ -4,8 +4,8 @@
 
 - import_tasks: nexus_install.yml
 
+# https://devops.profitbricks.com/tutorials/configure-apache-as-a-reverse-proxy-using-mod_proxy-on-ubuntu/
 - import_tasks: httpd_reverse_proxy_config.yml
-  when: httpd_setup_enable
 
 - import_tasks: admin_password_setup.yml
 

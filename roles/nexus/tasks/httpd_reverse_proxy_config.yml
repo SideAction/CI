@@ -1,17 +1,35 @@
 ---
 - name: Copy httpd vhost
-  template: src="nexus-vhost.conf" dest="/etc/httpd/conf.d"
+  template: src="nexus-vhost.conf" dest="/etc/apache2/conf-available"
 
-- name: Copy SSL certificate file
+- name: No point in pw login without https, so make this the fallback
+  when: generate_http_cert == true
+  command: openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -keyout /etc/pki/tls/private -out /etc/pki/tls/certs/nexus.vm.crt
+
+- name: Change cert permissions if genreated
+  when: generate_http_cert == true
+  file:
+    src: /etc/pki/tls/certs/nexus.vm.crt
+    mode: 600
+
+- name: Change cert permissions if generated
+  when: generate_http_cert == true
+  file:
+    dest: /etc/pki/tls/private
+    mode: 600
+
+- name: Change permissions on a copied cert
+  when: generate_http_cert !=  true
   copy:
     src: "{{ httpd_ssl_certificate_file }}"
     dest: "/etc/pki/tls/certs"
     mode: 600
 
-- name: Copy SSL certificate key file
+- name: Copy SSL certificate key file that was specified
+  when: generate_http_cert != true
   copy:
     src: "{{ httpd_ssl_certificate_key_file }}"
-    dest: "/etc/pki/tls/private"
+    dest: /etc/pki/tls/private
     mode: 600
 
 - name: Setsebool httpd_can_network_connect

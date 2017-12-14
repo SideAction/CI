@@ -1,6 +1,10 @@
 ---
 - hosts: gocdserver
   roles:
+    - java
+
+- hosts: gocdserver
+  roles:
     - common
 
 - hosts: gocdserver

@@ -36,7 +36,8 @@ public_hostname: 'nexus.vm'
 nexus_branding_header: ""
 nexus_branding_footer: "Last provisionned {{ ansible_date_time.iso8601 }}"
 
-httpd_setup_enable: false
+httpd_setup_enable: true
+generate_http_cert: true
 httpd_ssl_certificate_file: 'files/nexus.vm.crt'
 httpd_ssl_certificate_key_file: 'files/nexus.vm.key'
 
@@ -79,11 +80,11 @@ nexus_proxy_exclude_hosts:
   - "[::1]"
 
 nexus_config_pypi: false
-nexus_config_docker: false
+nexus_config_docker: true
 nexus_config_raw: false
 nexus_config_rubygems: false
 nexus_config_bower: false
-nexus_config_npm: false
+nexus_config_npm: true
 nexus_config_gitlfs: false
 
 # also see _nexus_privilege_defaults below

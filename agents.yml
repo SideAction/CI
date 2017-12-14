@@ -1,6 +1,10 @@
 ---
 - hosts: agent*
   roles:
+    - java
+
+- hosts: agent*
+  roles:
     - common
 
 - hosts: agent*
