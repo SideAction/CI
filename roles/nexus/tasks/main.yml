@@ -1,11 +1,12 @@
 ---
+# https://devops.profitbricks.com/tutorials/configure-apache-as-a-reverse-proxy-using-mod_proxy-on-ubuntu/
+- import_tasks: httpd_reverse_proxy_config.yml
+
 - import_tasks: nexus_purge.yml
   when: ((purge is defined) and (purge | bool))
 
 - import_tasks: nexus_install.yml
 
-# https://devops.profitbricks.com/tutorials/configure-apache-as-a-reverse-proxy-using-mod_proxy-on-ubuntu/
-- import_tasks: httpd_reverse_proxy_config.yml
 
 - import_tasks: admin_password_setup.yml
 

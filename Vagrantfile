@@ -15,13 +15,15 @@ Vagrant.configure("2") do |config|
 
     nexus.vm.hostname = "nexus"
     nexus.vm.network "private_network", ip: "#{nexus_ip}"
-    nexus.vm.network "forwarded_port", guest: 8081, host: 8155, host_ip: "127.0.0.1"
+    nexus.vm.network "forwarded_port", guest: 443, host: 8155, host_ip: "127.0.0.1"
 
     nexus.vm.synced_folder "./", "/vagrant"
     nexus.vm.provider "virtualbox" do |v|
         v.memory = 1024
         v.cpus = 1
     end
+
+    nexus.vm.provision "shell", inline: "apt-get update; apt-get upgrade -y"
 
     nexus.vm.provision "ansible" do |ansible|
       ansible.extra_vars = {}
@@ -33,7 +35,6 @@ Vagrant.configure("2") do |config|
     end
   end
 
-=begin
   config.vm.define "gocdserver" do |server|
     server.vm.box = "bento/ubuntu-16.04"
     server.ssh.forward_agent = true
@@ -100,7 +101,6 @@ Vagrant.configure("2") do |config|
       end
     end
   end
-=end
 
 end
 
