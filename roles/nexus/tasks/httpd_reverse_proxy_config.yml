@@ -9,7 +9,7 @@
     - build-essential
 
 - name: Apache2 module setup for reverse proxy
-  become:
+  become: true
   apache2_module: name={{ item }} state=present
   with_items:
     - proxy
