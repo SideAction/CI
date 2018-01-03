@@ -1,0 +1,24 @@
+[req]
+req_extensions = v3_req
+
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+C = US
+ST = VA
+L = Arlington
+O = SideAction
+OU = Newbs
+CN = nexus.ci-sideaction.org
+
+[ v3_req ]
+# Extensions to add to a certificate request
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = nexus
+DNS.2 = nexus.internal.ci-sideaction.org

@@ -23,10 +23,8 @@ Vagrant.configure("2") do |config|
         v.cpus = 1
     end
 
-    nexus.vm.provision "shell", inline: "apt-get update; apt-get upgrade -y"
-
+    nexus.vm.provision "shell", inline: 'DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade'
     nexus.vm.provision "ansible" do |ansible|
-      ansible.extra_vars = {}
       ansible.become = true
       ansible.limit = "all"
       ansible.verbose = "v"
@@ -35,6 +33,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
+=begin
   config.vm.define "gocdserver" do |server|
     server.vm.box = "bento/ubuntu-16.04"
     server.ssh.forward_agent = true
@@ -50,17 +49,21 @@ Vagrant.configure("2") do |config|
         v.cpus = 1
     end
 
+    server.vm.provision "shell", inline: 'DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade'
     server.vm.provision "ansible" do |ansible|
       ansible.groups = {
           "server" => ["default"],
           "agents" => ["default"]
       }
       ansible.extra_vars = {
-          GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com'
+          GOCD_ADMIN_EMAIL: "jcarlson@gmail.com",
+          GOCD_CI_ADMIN_PW: "password",
+          GOCD_CI_USER_PW: "CI",
+          WTF: "WTF",
+          remote_user: "vagrant"
       }
       ansible.limit = "all"
       ansible.verbose = "v"
-      ansible.extra_vars = {remote_user: "vagrant"}
       ansible.playbook = "server.yml"
     end
   end
@@ -83,6 +86,7 @@ Vagrant.configure("2") do |config|
       # Only execute once the Ansible provisioner,
       # when all the agents are up and ready.
       if agent_id == N
+        agent.vm.provision "shell", inline: 'DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade'
         agent.vm.provision :ansible do |ansible|
           # Disable default limit to connect to all the agents
           ansible.limit = "all"
@@ -101,6 +105,6 @@ Vagrant.configure("2") do |config|
       end
     end
   end
-
+=end
 end
 

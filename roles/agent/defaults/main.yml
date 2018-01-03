@@ -35,6 +35,8 @@ GOCD_SSH_KNOWN_DOMAIN: github.com
 GOCD_SSH_PRIVATE_KEY: 
 GOCD_SSH_PUBLIC_KEY: 
 
+NEXUS_SERVER: "nexus"
+
 # Used internally. Do not change.
 GOCD_VALID_EMAIL_REGEX: '\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b'
 

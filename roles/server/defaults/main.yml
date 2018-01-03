@@ -8,6 +8,9 @@ GOCD_USERID: 5000
 GOCD_GROUP: go
 GOCD_GROUPID: 5000
 
+GOCD_CI_ADMIN_PW: "changeme"
+GOCD_CI_USER_PW: "changeme"
+
 # Agent auto-registration; this is insecure and you should override this value for real usage
 GOCD_AUTO_REGISTER_KEY: insecure_registration_key
 

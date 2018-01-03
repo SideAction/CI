@@ -38,27 +38,27 @@
   when: generate_http_cert == true
   file:
     path: /etc/apache2/ssl/nexus.vm.crt
-    mode: 600
+    mode: 0600
 
 - name: Change cert key permissions if generated
   when: generate_http_cert == true
   file:
     path: /etc/apache2/ssl/nexus.vm.key
-    mode: 600
+    mode: 0600
 
 - name: Change permissions on a copied cert
   when: generate_http_cert !=  true
   copy:
     src: "{{ httpd_ssl_certificate_file }}"
     dest: "/etc/pki/tls/certs"
-    mode: 600
+    mode: 0600
 
 - name: Copy SSL certificate key file that was specified
   when: generate_http_cert != true
   copy:
     src: "{{ httpd_ssl_certificate_key_file }}"
     dest: /etc/pki/tls/private
-    mode: 600
+    mode: 0600
 
 #- name: Setsebool httpd_can_network_connect
 #  shell: 'setsebool -P httpd_can_network_connect on'

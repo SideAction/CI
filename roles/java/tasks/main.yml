@@ -30,3 +30,10 @@
 - name: set GOCD_JAVA_HOME
   set_fact:
      GOCD_JAVA_HOME: "{{ system_java_home.stdout }}"
+
+- debug:
+    msg: "What is the java home? {{ system_java_home.stdout }}"
+
+- name: Ensure that java in /usr/bin/java is actually runnable
+  shell: java -version
+

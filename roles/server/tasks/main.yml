@@ -1,6 +1,7 @@
 ---
-   - import_tasks: go-server.yml
-   - import_tasks: server-config.yml
-     when: GOCD_CONFIGURE
-   - import_tasks: plugins.yml
-     when: GOCD_MANAGE_PLUGINS
+- include_tasks: server-auth.yml
+- include_tasks: go-server.yml
+- include_tasks: server-config.yml
+  when: GOCD_CONFIGURE
+- include_tasks: plugins.yml
+  when: GOCD_MANAGE_PLUGINS

@@ -1,0 +1,35 @@
+---
+- name: "We are attempting to setup authentication"
+  debug:
+    msg: "What the fuck {{ GOCD_CI_ADMIN_PW }} and {{ GOCD_CI_USER_PW }} "
+
+- name: Install the password utility for creating a password properties file (htpasswd)
+  become: true
+  apt: 
+    state: installed 
+    name: apache2-utils
+
+- name: Ensure dir exists
+  become: true
+  file:
+    path: /etc/go
+    owner: "{{ GOCD_USER }}"
+    group: "{{ GOCD_GROUP }}"
+    state: directory
+
+- name: Run the commands to actually generate the passwords
+  become: true
+  shell: "htpasswd -cbB /etc/go/password.properties admin {{ GOCD_CI_ADMIN_PW }}"
+
+- name: Run the commands to actually generate the passwords
+  become: true
+  shell: "htpasswd -bB /etc/go/password.properties CI {{ GOCD_CI_USER_PW }} "
+
+- name: Set permissions on these files
+  become: true
+  file: 
+    path: /etc/go/password.properties
+    mode: 0600
+    group: "{{ GOCD_GROUP }}"
+    owner: "{{ GOCD_USER }}"
+

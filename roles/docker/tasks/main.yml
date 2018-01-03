@@ -39,6 +39,10 @@
     group: docker
     append: yes
 
+- name: Setup a set of exceptions for insecure docker hosts
+  template: "src=daemon.json dest=/etc/docker/daemon.json mode=0644 group=root owner=root"
+  become: true
+
 - name: Make it so the go user can actually run docker commands
   become: true
   user:
