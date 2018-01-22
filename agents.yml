@@ -1,5 +1,10 @@
 ---
 - hosts: agent*
+  gather_facts: False
+  roles:
+    - base
+
+- hosts: agent*
   roles:
     - java
 

@@ -36,7 +36,7 @@ public_hostname: 'nexus.vm'
 nexus_branding_header: ""
 nexus_branding_footer: "Last provisionned {{ ansible_date_time.iso8601 }}"
 
-httpd_setup_enable: false
+httpd_setup_enable: true
 generate_http_cert: true
 httpd_ssl_certificate_file: 'nexus.vm.crt'
 httpd_ssl_certificate_key_file: 'nexus.vm.key'
@@ -69,7 +69,7 @@ nexus_http_proxy_host: "proxy.example.com"
 nexus_http_proxy_port: 8080
 nexus_http_proxy_username: ""
 nexus_http_proxy_password: ""
-nexus_with_https_proxy: true
+nexus_with_https_proxy: false
 nexus_https_proxy_host: "nexus"
 nexus_https_proxy_port: 443
 nexus_https_proxy_username: ""

@@ -27,9 +27,16 @@
 - name: Create SSL directory
   file: path="/etc/apache2/ssl" state=directory owner=www-data group=www-data mode=0700 recurse=yes
 
+- name: Copy in the cert request (make a slightly less trash cert)
+  when: generate_http_cert == true
+  copy:
+    src: "req-input.txt"
+    dest: "/etc/apache2/ssl/req-input.txt"
+    mode: 0600
+
 - name: No point in pw login without https, so make this the fallback
   when: generate_http_cert == true
-  command: openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/nexus.vm.key -out /etc/apache2/ssl/nexus.vm.crt
+  command: openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -config /etc/apache2/ssl/req-input.txt -keyout /etc/apache2/ssl/nexus.vm.key -out /etc/apache2/ssl/nexus.vm.crt
 
 - name: Copy httpd vhost
   template: src="nexus-vhost.conf" dest="/etc/apache2/sites-available/nexus-vhost.conf"

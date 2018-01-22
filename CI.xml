@@ -1,7 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="97">
-  <server artifactsdir="artifacts" agentAutoRegisterKey="d8e136a6-3d66-49c4-b7b1-6427abecaadb" webhookSecret="6c1fa407-27d1-4245-aa6f-8d7b34df87a8" commandRepositoryLocation="default" serverId="452f4fc2-18fb-4a1e-82fb-a8adbed60537" />
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="100">
+  <server artifactsdir="artifacts" agentAutoRegisterKey="26711136-937a-4a02-b541-9680798239df" webhookSecret="dd507dd9-5387-4d7e-92f5-d1177f79d76d" commandRepositoryLocation="default" serverId="72b633ca-7d63-47a3-90cb-89b4f4eaff46" tokenGenerationKey="53f7a2fb-f74e-4e47-bc65-03ecbd1e4484" />
   <pipelines group="CI">
+    <pipeline name="YarnInstall">
+      <environmentvariables>
+        <variable name="TSAPP">
+          <value>tsapp.tar.gz</value>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <git url="https://github.com/UberMeatShield/contented.git" />
+      </materials>
+      <stage name="Setup" cleanWorkingDir="true">
+        <jobs>
+          <job name="Install">
+            <tasks>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>whoami</arg>
+                <arg>git symbolic-ref --short HEAD</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>docker login nexus:8087 -u admin -p changeme</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>docker pull nexus:8087/ts:latest</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>docker run -u go:go -v $(pwd):/home/go/bouldering nexus:8087/ts:latest /bin/bash -c "cd /home/go/bouldering; yarn install"</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>ls -lah</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="/bin/bash">
+                <arg>-c</arg>
+                <arg>tar -czf $TSAPP node_modules/ package.json yarn.lock tslint.json tsconfig.json src/ gulpfile.js karma.conf.js</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact src="tsapp.tar.gz" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
     <pipeline name="Typescript">
       <environmentvariables>
         <variable name="TSAPP">
@@ -113,45 +165,6 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="YarnInstall">
-      <environmentvariables>
-        <variable name="TSAPP">
-          <value>tsapp.tar.gz</value>
-        </variable>
-      </environmentvariables>
-      <materials>
-        <git url="https://github.com/UberMeatShield/contented.git" />
-      </materials>
-      <stage name="Setup" cleanWorkingDir="true">
-        <jobs>
-          <job name="Install">
-            <tasks>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>yarn install</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>tar -czf $TSAPP node_modules/ package.json yarn.lock tslint.json tsconfig.json src/ gulpfile.js karma.conf.js</arg>
-                <runif status="passed" />
-              </exec>
-              <exec command="/bin/bash">
-                <arg>-c</arg>
-                <arg>ls -lah</arg>
-                <runif status="passed" />
-              </exec>
-            </tasks>
-            <artifacts>
-              <artifact src="tsapp.tar.gz" />
-            </artifacts>
-          </job>
-        </jobs>
-      </stage>
-    </pipeline>
   </pipelines>
-  <agents>
-    <agent hostname="vagrant" ipaddress="127.0.0.1" uuid="0f65c7b1-5f73-472f-9685-4d7683a5276f" />
-    <agent hostname="vagrant" ipaddress="127.0.0.1" uuid="b7692d6b-0957-429b-98b0-fd27184e3b75" />
-  </agents>
 </cruise>
+

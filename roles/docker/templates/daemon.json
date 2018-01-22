@@ -1,6 +1,7 @@
 {
   "insecure-registries": [
     "{{ NEXUS_SERVER }}:{{ NEXUS_DOCKER_PORT }}",
+    "{{ NEXUS_SERVER }}:{{ NEXUS_DOCKER_PORT|int - 1}}",
     "{{ NEXUS_SERVER }}:{{ NEXUS_DOCKER_REGISTRY_PORT }}"
   ],
   "disable-legacy-registry": true

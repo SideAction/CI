@@ -36,7 +36,7 @@
   user: 
     name: ubuntu
     comment: "Seriously docker, wtf"
-    group: docker
+    groups: docker
     append: yes
 
 - name: Setup a set of exceptions for insecure docker hosts
@@ -48,8 +48,18 @@
   user:
     name: go
     comment: "Go build system"
-    group: docker
+    groups: docker
+    state: present
     append: yes
+
+- name: In development add vagrant to the docker group
+  become: true
+  when: ENV == "development"
+  user:
+    name: vagrant
+    comment: "Dev, add the vagrant user."
+    groups: docker
+    state: present
     
 - name: Validate docker is up and running an that we can run docker commands
   shell: docker run hello-world

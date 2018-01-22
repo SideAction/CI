@@ -1,4 +1,10 @@
 ---
+
+- hosts: gocdserver
+  gather_facts: False
+  roles:
+    - base
+
 - hosts: gocdserver
   roles:
     - java

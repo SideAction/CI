@@ -23,7 +23,6 @@ Vagrant.configure("2") do |config|
         v.cpus = 1
     end
 
-    nexus.vm.provision "shell", inline: 'DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade'
     nexus.vm.provision "ansible" do |ansible|
       ansible.become = true
       ansible.limit = "all"
@@ -33,7 +32,6 @@ Vagrant.configure("2") do |config|
     end
   end
 
-=begin
   config.vm.define "gocdserver" do |server|
     server.vm.box = "bento/ubuntu-16.04"
     server.ssh.forward_agent = true
@@ -49,7 +47,6 @@ Vagrant.configure("2") do |config|
         v.cpus = 1
     end
 
-    server.vm.provision "shell", inline: 'DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade'
     server.vm.provision "ansible" do |ansible|
       ansible.groups = {
           "server" => ["default"],
@@ -59,7 +56,6 @@ Vagrant.configure("2") do |config|
           GOCD_ADMIN_EMAIL: "jcarlson@gmail.com",
           GOCD_CI_ADMIN_PW: "password",
           GOCD_CI_USER_PW: "CI",
-          WTF: "WTF",
           remote_user: "vagrant"
       }
       ansible.limit = "all"
@@ -78,6 +74,11 @@ Vagrant.configure("2") do |config|
       agent.vm.hostname = "gocd.agent#{agent_id}"
       agent.vm.network "private_network", ip: "#{network}.#{20+agent_id}"
 
+      agent.vm.provision "shell",
+       inline: "echo \"gocd #{server_ip}\" >> /etc/hosts"
+      agent.vm.provision "shell",
+       inline: "echo \"nexus #{nexus_ip}\" >> /etc/hosts"
+
       agent.vm.provider "virtualbox" do |v|
         v.memory = 1024
         v.cpus = 1
@@ -86,12 +87,10 @@ Vagrant.configure("2") do |config|
       # Only execute once the Ansible provisioner,
       # when all the agents are up and ready.
       if agent_id == N
-        agent.vm.provision "shell", inline: 'DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade'
         agent.vm.provision :ansible do |ansible|
           # Disable default limit to connect to all the agents
           ansible.limit = "all"
           ansible.playbook = "agents.yml"
-          ansible.extra_vars = {"remote_user": "vagrant"}
 
           ansible.groups = {
               "server" => ["default"],
@@ -99,12 +98,12 @@ Vagrant.configure("2") do |config|
           }
           ansible.extra_vars = {
               GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com',
-              GOCD_SERVER_HOST: server_ip
+              GOCD_SERVER_HOST: 'gocd',
+              ENV: "development"
           }
         end
       end
     end
   end
-=end
 end
 
