@@ -75,9 +75,9 @@ Vagrant.configure("2") do |config|
       agent.vm.network "private_network", ip: "#{network}.#{20+agent_id}"
 
       agent.vm.provision "shell",
-       inline: "echo \"gocd #{server_ip}\" >> /etc/hosts"
+       inline: "echo \"#{server_ip} gocd\" >> /etc/hosts"
       agent.vm.provision "shell",
-       inline: "echo \"nexus #{nexus_ip}\" >> /etc/hosts"
+       inline: "echo \"#{nexus_ip} nexus\" >> /etc/hosts"
 
       agent.vm.provider "virtualbox" do |v|
         v.memory = 1024

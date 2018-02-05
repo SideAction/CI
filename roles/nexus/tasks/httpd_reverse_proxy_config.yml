@@ -30,13 +30,14 @@
 - name: Copy in the cert request (make a slightly less trash cert)
   when: generate_http_cert == true
   copy:
-    src: "req-input.txt"
-    dest: "/etc/apache2/ssl/req-input.txt"
+    src: "req-input.cnf"
+    dest: "/etc/apache2/ssl/req-input.cnf"
     mode: 0600
 
-- name: No point in pw login without https, so make this the fallback
+  #openssl req -x509 -config req-input.cnf -newkey rsa:4096 -sha256 -nodes -out nexus.pem -outform PEM
+- name: HTTPs setup for nexus
   when: generate_http_cert == true
-  command: openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -config /etc/apache2/ssl/req-input.txt -keyout /etc/apache2/ssl/nexus.vm.key -out /etc/apache2/ssl/nexus.vm.crt
+  command: openssl req -x509 -batch -nodes -days 1024 -newkey rsa:2048 -config /etc/apache2/ssl/req-input.cnf -keyout /etc/apache2/ssl/nexus.vm.key -out /etc/apache2/ssl/nexus.vm.crt -outform PEM
 
 - name: Copy httpd vhost
   template: src="nexus-vhost.conf" dest="/etc/apache2/sites-available/nexus-vhost.conf"
