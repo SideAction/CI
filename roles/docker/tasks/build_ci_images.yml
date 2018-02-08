@@ -1,0 +1,11 @@
+- name: Copy in the docker file
+  copy:
+    src: "Dockerfile"
+    dest: "/tmp/Dockerfile"
+    mode: 0600
+
+
+- name: Build out the docker image (does not push it up)
+  shell: "docker build -t {{ TS_CI_IMAGE }} ."
+  args:
+      chdir: "/tmp"

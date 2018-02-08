@@ -4,7 +4,7 @@ network = "192.168.77"
 server_ip = "#{network}.66"
 nexus_ip = "#{network}.67"
 box = "bento/ubuntu-16.04"
-N = 2
+N = 1
 
 Vagrant.configure("2") do |config|
 
@@ -27,7 +27,11 @@ Vagrant.configure("2") do |config|
       ansible.become = true
       ansible.limit = "all"
       ansible.verbose = "v"
-      ansible.extra_vars = {remote_user: "vagrant"}
+      ansible.extra_vars = {
+        remote_user: "vagrant",
+        DO_DOCKER_LOGIN: "yes",
+        ENV: "development"
+      }
       ansible.playbook = "nexus.yml"
     end
   end
@@ -99,11 +103,13 @@ Vagrant.configure("2") do |config|
           ansible.extra_vars = {
               GOCD_ADMIN_EMAIL: 'jcarlson@gmail.com',
               GOCD_SERVER_HOST: 'gocd',
+              DO_DOCKER_LOGIN: "yes",
               ENV: "development"
           }
         end
       end
     end
   end
+
 end
 

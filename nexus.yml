@@ -10,9 +10,9 @@
 
 - hosts: nexus
   roles:
-    - docker
-
-- hosts: nexus
-  roles:
     - nexus
 
+# DOCKER has to happen only after the build out of nexus (with a login)
+- hosts: nexus
+  roles:
+    - docker

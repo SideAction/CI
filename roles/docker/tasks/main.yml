@@ -43,6 +43,12 @@
   template: "src=daemon.json dest=/etc/docker/daemon.json mode=0644 group=root owner=root"
   become: true
 
+- name: Reload the configuration
+  become: true
+  service:
+    name: docker
+    state: restarted
+
 - name: Make it so the go user can actually run docker commands
   become: true
   user:
@@ -66,4 +72,25 @@
   become: true
   become_user: go
 
+- name: Login to the nexus docker images proxy
+  become: true
+  become_user: go
+  when: DO_DOCKER_LOGIN == "yes"
+  shell: "docker login -u {{ NEXUS_LOGIN }} -p {{ NEXUS_PW }} {{ NEXUS_SERVER }}:{{ NEXUS_DOCKER_PORT }}"
 
+- name: Login to the nexus docker registry as well
+  become: true
+  become_user: go
+  when: DO_DOCKER_LOGIN == "yes"
+  shell: "docker login -u {{ NEXUS_LOGIN }} -p {{ NEXUS_PW }} {{ NEXUS_SERVER }}:{{ NEXUS_DOCKER_REGISTRY_PORT }}"
+
+- name: Pull an image onto the host so we are ready to run tests.
+  when: DO_IMAGE_PULL == "yes"
+  become: true
+  become_user: go
+  shell: "docker pull {{TS_CI_IMAGE}}"
+
+- name: Build Docker image (likely done on nexus)
+  import_tasks: build_ci_images.yml
+
+  #when: DO_IMAGE_BUILD == "yes"
